@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# PyCharm
+.idea/
+
+# Mac OS
+.DS_Store
+
+# Test / data
+.pytest_cache/
+test/test_*/
+test/*outdir*/
+test/*workdir*/
+
+# PyInstaller
+build/
+dist/
+SeqsUI.spec
+
+todo.md
