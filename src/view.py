@@ -113,7 +113,6 @@ class View(QWidget):
         self.buttons = dict()
         for name, label in BUTTON_NAME_TO_LABEL.items():
             button = QPushButton(label, self)
-            button.setFixedSize(120, 30)
             self.button_layout.addWidget(button)
             self.buttons[name] = button
 
