@@ -1,12 +1,13 @@
+import os
 from typing import List, Tuple, Dict, Union
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, \
-    QPushButton, QScrollArea, QCheckBox, QMessageBox, QFileDialog
-from .io import IO
+    QPushButton, QScrollArea, QCheckBox, QMessageBox, QFileDialog, QDialog, QFormLayout, \
+    QLineEdit, QDialogButtonBox
 
 
 DEFAULT_KEY_VALUES = {
     'User': '',
-    'Password': '',
     'Host': '255.255.255.255',
     'Port': '22',
     'Qiime2 Version': 'qiime2-2021.11',
@@ -31,7 +32,6 @@ DEFAULT_KEY_VALUES = {
 }
 SSH_KEYS = [
     'User',
-    'Password',
     'Host',
     'Port',
     'Qiime2 Version',
@@ -64,7 +64,9 @@ BUTTON_NAME_TO_LABEL = {
 
 class View(QWidget):
 
-    model: IO
+    TITLE = 'Qiime2 App'
+    ICON_PNG = f'{os.getcwd()}/icon/logo.ico'
+    WIDTH, HEIGHT = 800, 1000
 
     question_layout: QVBoxLayout
     label_combo_pairs: List[Tuple[QLabel, QComboBox]]
@@ -77,11 +79,11 @@ class View(QWidget):
 
     main_layout: QVBoxLayout
 
-    def __init__(self, model: IO):
+    def __init__(self):
         super().__init__()
-        self.model = model
-        self.setWindowTitle('Qiime2 App')
-        self.resize(600, 1000)
+        self.setWindowTitle(self.TITLE)
+        self.setWindowIcon(QIcon(self.ICON_PNG))
+        self.resize(self.WIDTH, self.HEIGHT)
 
         self.__init_label_combo_pairs()
         self.__init_buttons()
@@ -134,6 +136,7 @@ class View(QWidget):
         self.message_box_yes_no = MessageBoxYesNo(self)
         self.file_dialog_open = FileDialogOpen(self)
         self.file_dialog_save = FileDialogSave(self)
+        self.password_dialog = PasswordDialog(self)
 
     def get_key_values(self) -> Dict[str, Union[str, bool]]:
         return self.__get_key_values(keys=SSH_KEYS + QIIME2_KEYS)
@@ -244,3 +247,47 @@ class FileDialogSave(FileDialog):
             options=QFileDialog.DontUseNativeDialog
         )
         return fpath
+
+
+class PasswordDialog:
+
+    LINE_TITLE = 'Password:'
+    LINE_DEFAULT = ''
+
+    parent: QWidget
+
+    dialog: QDialog
+    layout: QFormLayout
+    line_edit: QLineEdit
+    button_box: QDialogButtonBox
+
+    def __init__(self, parent: QWidget):
+        self.parent = parent
+        self.__init_dialog()
+        self.__init_layout()
+        self.__init_line_edit()
+        self.__init_button_box()
+
+    def __init_dialog(self):
+        self.dialog = QDialog(parent=self.parent)
+        self.dialog.setWindowTitle(' ')
+
+    def __init_layout(self):
+        self.layout = QFormLayout(parent=self.dialog)
+
+    def __init_line_edit(self):
+        self.line_edit = QLineEdit(self.LINE_DEFAULT, parent=self.dialog)
+        self.line_edit.setEchoMode(QLineEdit.Password)
+        self.layout.addRow(self.LINE_TITLE, self.line_edit)
+
+    def __init_button_box(self):
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, parent=self.dialog)
+        self.button_box.accepted.connect(self.dialog.accept)
+        self.button_box.rejected.connect(self.dialog.reject)
+        self.layout.addWidget(self.button_box)
+
+    def __call__(self) -> Union[str, tuple]:
+        if self.dialog.exec_() == QDialog.Accepted:
+            return self.line_edit.text()
+        else:
+            return ''

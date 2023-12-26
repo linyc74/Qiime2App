@@ -12,7 +12,7 @@ class EntryPoint:
 
     APP_ID = f'NYCU.Dentistry.Qiime2App.{__VERSION__}'
 
-    model: IO
+    io: IO
     view: View
     controller: Controller
 
@@ -21,9 +21,9 @@ class EntryPoint:
 
         app = QApplication(sys.argv)
 
-        self.model = IO()
-        self.view = View(model=self.model)
-        self.controller = Controller(io=self.model, view=self.view)
+        self.io = IO()
+        self.view = View()
+        self.controller = Controller(io=self.io, view=self.view)
 
         sys.exit(app.exec_())
 

@@ -1,7 +1,7 @@
 from typing import Dict
 from fabric import Connection
-from .view import View
 from .io import IO
+from .view import View
 
 
 class Controller:
@@ -71,6 +71,7 @@ class ActionSubmit(Action):
 
     view: View
 
+    ssh_password: str
     ssh_key_values: Dict[str, str]
     qiime2_key_values: Dict[str, str]
     con: Connection
@@ -79,6 +80,11 @@ class ActionSubmit(Action):
     submit_cmd: str
 
     def __call__(self):
+
+        self.ssh_password = self.view.password_dialog()
+        if self.ssh_password == '':
+            return
+
         if not self.view.message_box_yes_no(msg='Are you sure you want to submit the job?'):
             return
 
@@ -108,7 +114,11 @@ class ActionSubmit(Action):
 
         args = [f'python {qiime2_pipeline}']
         for key, val in self.qiime2_key_values.items():
-            args.append(f'--{key} {val}')
+            if type(val) is bool:
+                if val is True:
+                    args.append(f'--{key}')
+            else:
+                args.append(f'--{key} {val}')
         args.append(f'2>&1 | tee {outdir}/progress.txt')  # `2>&1` stderr to stdout --> tee to progress.txt
         self.qiime2_cmd = ' '.join(args)
 
@@ -129,7 +139,7 @@ class ActionSubmit(Action):
             host=s['Host'],
             user=s['User'],
             port=s['Port'],
-            connect_kwargs={'password': s['Password']}
+            connect_kwargs={'password': self.ssh_password}
         )
 
     def submit_job(self):
