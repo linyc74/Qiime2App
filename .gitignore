@@ -17,6 +17,6 @@ test/*workdir*/
 # PyInstaller
 build/
 dist/
-SeqsUI.spec
+Qiime2App.spec
 
 todo.md
