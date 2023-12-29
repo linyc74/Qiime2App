@@ -28,6 +28,8 @@ DEFAULT_KEY_VALUES = {
     'max-expected-error-bases': '8.0',
     'heatmap-read-fraction': '0.95',
     'n-taxa-barplot': '20',
+    'colormap': 'Set1',
+    'invert-colors': False,
     'threads': '8',
 }
 SSH_KEYS = [
@@ -53,6 +55,8 @@ QIIME2_KEYS = [
     'max-expected-error-bases',
     'heatmap-read-fraction',
     'n-taxa-barplot',
+    'colormap',
+    'invert-colors',
     'threads',
 ]
 BUTTON_NAME_TO_LABEL = {

@@ -17,13 +17,14 @@ class IO:
     def __read(self, file: str, sep: str) -> Dict[str, Union[str, bool]]:
         ret = {}
         with open(file) as fh:
-            for line in fh:
-                _line = line.rstrip()
-                if sep in _line:
-                    key, val = _line.split(sep)
-                    val = val.lstrip()
-                else:
-                    key, val = _line, True
+            for line_ in fh:
+                line = line_.strip()
+                if sep not in line:  # flag without value
+                    line += sep
+                key, val = line.split(sep)
+                val = val.strip()
+                if val == '':  # flag without value
+                    val = True
                 ret[key] = val
         return ret
 
