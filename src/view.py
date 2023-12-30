@@ -238,8 +238,8 @@ class FileDialogOpen(FileDialog):
         fpath, ftype = QFileDialog.getOpenFileName(
             parent=self.parent,
             caption='Open',
-            filter='TXT files (*.txt);;TSV files (*.tsv);;tab files (*.tab);;CSV files (*.csv)',
-            initialFilter='TXT files (*.txt)',
+            filter='CSV files (*.csv);;TSV files (*.tsv);;tab files (*.tab);;TXT files (*.txt)',
+            initialFilter='CSV files (*.csv)',
             options=QFileDialog.DontUseNativeDialog
         )
         return fpath
@@ -252,8 +252,8 @@ class FileDialogSave(FileDialog):
             parent=self.parent,
             caption='Save As',
             directory=filename,
-            filter='TXT files (*.txt);;TSV files (*.tsv);;tab files (*.tab);;CSV files (*.csv)',
-            initialFilter='TXT files (*.txt)',
+            filter='CSV files (*.csv);;TSV files (*.tsv);;tab files (*.tab);;TXT files (*.txt)',
+            initialFilter='CSV files (*.csv)',
             options=QFileDialog.DontUseNativeDialog
         )
         return fpath
