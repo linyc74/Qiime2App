@@ -164,6 +164,12 @@ class View(QWidget):
         return ret
 
     def set_parameters(self, parameters: Dict[str, Union[str, bool]]):
+        # Reset flags to False because
+        #   when a flag is not present in parameters, it should be False
+        for _, combo in self.label_combo_pairs:
+            if type(combo) is QCheckBox:
+                combo.setChecked(False)
+
         for key, val in parameters.items():
             for label, combo in self.label_combo_pairs:
                 if label.text()[:-1] == key:
