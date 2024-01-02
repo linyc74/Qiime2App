@@ -5,7 +5,7 @@ from .io import IO
 from .controller import Controller
 
 
-__VERSION__ = '1.0.0-beta'
+__VERSION__ = '1.0.0'
 
 
 class EntryPoint:
