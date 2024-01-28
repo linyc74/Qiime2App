@@ -30,6 +30,7 @@ DEFAULT_KEY_VALUES = {
     'n-taxa-barplot': '20',
     'colormap': 'Set1',
     'invert-colors': False,
+    'publication-figure': False,
     'threads': '8',
 }
 SSH_KEYS = [
@@ -57,6 +58,7 @@ QIIME2_KEYS = [
     'n-taxa-barplot',
     'colormap',
     'invert-colors',
+    'publication-figure',
     'threads',
 ]
 BUTTON_NAME_TO_LABEL = {
