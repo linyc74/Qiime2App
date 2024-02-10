@@ -31,14 +31,12 @@ class IO:
     def write(self,
               parameters: Dict[str, Union[str, bool]],
               file: str):
-        if file.endswith('.txt'):
-            self.__write(parameters, file, sep=': ')
-        elif file.endswith('.tsv') or file.endswith('.tab'):
+        if file.endswith('.tsv') or file.endswith('.tab'):
             self.__write(parameters, file, sep='\t')
         elif file.endswith('.csv'):
             self.__write(parameters, file, sep=',')
-        else:
-            raise ValueError(f'Unknown file type: {file}')
+        else:  # pure txt format
+            self.__write(parameters, file, sep=': ')
 
     def __write(
             self,
