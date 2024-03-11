@@ -5,12 +5,17 @@ from .io import IO
 from .controller import Controller
 
 
-__VERSION__ = 'v1.1.1-beta'
+VERSION = 'v1.2.0-beta'
+STARTING_MESSAGE = f'''\
+Qiime2App {VERSION}
+College of Dentistry, National Yang Ming Chiao Tung University (NYCU), Taiwan
+Yu-Cheng Lin, DDS, MS, PhD (ylin@nycu.edu.tw)
+'''
 
 
 class EntryPoint:
 
-    APP_ID = f'NYCU.Dentistry.Qiime2App.{__VERSION__}'
+    APP_ID = f'NYCU.Dentistry.Qiime2App.{VERSION}'
 
     io: IO
     view: View
@@ -24,6 +29,8 @@ class EntryPoint:
         self.io = IO()
         self.view = View()
         self.controller = Controller(io=self.io, view=self.view)
+
+        print(STARTING_MESSAGE, flush=True)
 
         sys.exit(app.exec_())
 

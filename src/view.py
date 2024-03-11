@@ -7,31 +7,32 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox
 
 
 DEFAULT_KEY_VALUES = {
-    'User': '',
-    'Host': '255.255.255.255',
-    'Port': '22',
-    'Qiime2 Version': 'qiime2-2021.11',
-    'Pipeline Version': 'qiime2_pipeline-2.0.0',
+    'User': [''],
+    'Host': ['255.255.255.255'],
+    'Port': ['22'],
+    'Qiime2 Version': ['qiime2-2021.11'],
+    'Pipeline Version': ['qiime2_pipeline-2.3.0'],
 
-    'sample-sheet': 'sample-sheet.csv',
-    'fq-dir': 'data',
-    'fq1-suffix': '_R1.fastq.gz',
-    'fq2-suffix': '_R2.fastq.gz',
-    'nb-classifier-qza': 'silva-138-99-nb-classifier.qza',
-    'outdir': 'output',
-    'paired-end-mode': 'merge',
+    'sample-sheet': ['sample-sheet.csv'],
+    'fq-dir': ['data'],
+    'fq1-suffix': ['_R1.fastq.gz'],
+    'fq2-suffix': ['_R2.fastq.gz'],
+    'nb-classifier-qza': ['silva-138-99-nb-classifier.qza'],
+    'outdir': ['output'],
+    'paired-end-mode': ['merge', 'pool'],
     'skip-otu': False,
-    'classifier-reads-per-batch': '1000',
-    'alpha-metrics': 'all',
-    'clip-r1-5-prime': '17',
-    'clip-r2-5-prime': '20',
-    'max-expected-error-bases': '8.0',
-    'heatmap-read-fraction': '0.95',
-    'n-taxa-barplot': '20',
-    'colormap': 'Set1',
+    'classifier-reads-per-batch': ['1000'],
+    'alpha-metrics': ['all'],
+    'clip-r1-5-prime': ['17'],
+    'clip-r2-5-prime': ['20'],
+    'max-expected-error-bases': ['8.0'],
+    'heatmap-read-fraction': ['0.95'],
+    'n-taxa-barplot': ['20'],
+    'beta-diversity-feature-level': ['feature', 'species', 'genus', 'family', 'order', 'class', 'phylum'],
+    'colormap': ['Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c', 'Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2'],
     'invert-colors': False,
     'publication-figure': False,
-    'threads': '8',
+    'threads': ['1', '4', '8'],
 }
 SSH_KEYS = [
     'User',
@@ -56,6 +57,7 @@ QIIME2_KEYS = [
     'max-expected-error-bases',
     'heatmap-read-fraction',
     'n-taxa-barplot',
+    'beta-diversity-feature-level',
     'colormap',
     'invert-colors',
     'publication-figure',
@@ -100,14 +102,14 @@ class View(QWidget):
     def __init_label_combo_pairs(self):
         self.question_layout = QVBoxLayout()
         self.label_combo_pairs = []
-        for key, value in DEFAULT_KEY_VALUES.items():
+        for key, values in DEFAULT_KEY_VALUES.items():
             label = QLabel(f'{key}:', self)
-            if type(value) is bool:
+            if type(values) is bool:
                 combo = QCheckBox(self)
-                combo.setChecked(value)
+                combo.setChecked(values)
             else:
                 combo = QComboBox(self)
-                combo.addItems([value])
+                combo.addItems(values)
                 combo.setEditable(True)
             self.label_combo_pairs.append((label, combo))
             self.question_layout.addWidget(label)
