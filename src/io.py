@@ -47,12 +47,15 @@ class IO:
     def write(self,
               parameters: Dict[str, Union[str, bool]],
               file: str):
+
         if file.endswith('.tsv') or file.endswith('.tab'):
-            self.__write(parameters, file, sep='\t')
+            sep = '\t'
         elif file.endswith('.csv'):
-            self.__write(parameters, file, sep=',')
+            sep = ','
         else:  # pure txt format
-            self.__write(parameters, file, sep=': ')
+            sep = ': '
+
+        self.__write(parameters=parameters, file=file, sep=sep)
 
     def __write(
             self,
