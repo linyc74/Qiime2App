@@ -122,6 +122,12 @@ class ActionSubmit(Action):
         args.append(f'2>&1 | tee {outdir}/progress.txt')  # `2>&1` stderr to stdout --> tee to progress.txt
         self.qiime2_cmd = ' '.join(args)
 
+        if '"' in self.qiime2_cmd:
+            print('Warning: double quotes in the Qiime2 pipeline command will be replaced by single quotes', flush=True)
+            # self.qiime2_cmd will be wrapped in double quotes in self.submit_cmd
+            # so double quotes needs to be avoided
+            self.qiime2_cmd = self.qiime2_cmd.replace('"', '\'')
+
     def set_submit_cmd(self):
         sample_sheet = self.qiime2_key_values['sample-sheet']
         outdir = self.qiime2_key_values['outdir']
