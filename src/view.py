@@ -178,8 +178,7 @@ class View(QWidget):
             for label, combo in self.label_combo_pairs:
                 if label.text()[:-1] == key:
                     if type(combo) is QComboBox:
-                        combo.clear()
-                        combo.addItems([val])
+                        combo.setCurrentText(val)
                     elif type(combo) is QCheckBox:
                         combo.setChecked(val)
 
