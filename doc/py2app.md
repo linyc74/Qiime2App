@@ -34,9 +34,15 @@ Run the app from the command line. It can also be run by double clicking the app
 dist/Qiime2App.app/Contents/MacOS/Qiime2App
 ```
 
-Remove unused build files.
+Move, compress the app, and clean up.
 
 ```zsh
+export VERSION="v0.0.0"
+
+mv dist/Qiime2App.app ./
+zip -r Qiime2App-mac-$VERSION.zip Qiime2App.app
+
+rm -r dist
 rm -r build
 rm setup.py
 ```
