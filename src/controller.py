@@ -133,7 +133,7 @@ class ActionSubmit(Action):
         outdir = self.qiime2_key_values['outdir']
 
         self.submit_cmd = ' && '.join([
-            f'mkdir {outdir}',
+            f'mkdir -p {outdir}',
             f'cp {sample_sheet} {outdir}/',
             f'echo "{self.qiime2_cmd}" > {outdir}/command.txt',
             f'screen -dm bash -c "{self.qiime2_cmd}"'
