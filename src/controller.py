@@ -117,9 +117,17 @@ class ActionSubmit(Action):
             if type(val) is bool:
                 if val is True:
                     args.append(f'--{key}')
-            else:
-                args.append(f'--{key} {val}')
+
+            else:  # val is string
+                sep = '=' if val.startswith('-') else ' '
+
+                if ' ' in val:
+                    val = f"'{val}'"  # use single quotes to protect spaces
+
+                args.append(f'--{key}{sep}{val}')
+
         args.append(f'2>&1 | tee {outdir}/progress.txt')  # `2>&1` stderr to stdout --> tee to progress.txt
+
         self.qiime2_cmd = ' '.join(args)
 
         if '"' in self.qiime2_cmd:
@@ -133,8 +141,8 @@ class ActionSubmit(Action):
         outdir = self.qiime2_key_values['outdir']
 
         self.submit_cmd = ' && '.join([
-            f'mkdir -p {outdir}',
-            f'cp {sample_sheet} {outdir}/',
+            f'mkdir -p "{outdir}"',
+            f'cp "{sample_sheet}" "{outdir}/"',
             f'echo "{self.qiime2_cmd}" > {outdir}/command.txt',
             f'screen -dm bash -c "{self.qiime2_cmd}"'
         ])
