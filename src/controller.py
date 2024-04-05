@@ -119,12 +119,7 @@ class ActionSubmit(Action):
                     args.append(f'--{key}')
 
             else:  # val is string
-                sep = '=' if val.startswith('-') else ' '
-
-                if ' ' in val:
-                    val = f"'{val}'"  # use single quotes to protect spaces
-
-                args.append(f'--{key}{sep}{val}')
+                args.append(f"--{key}='{val}'")
 
         args.append(f'2>&1 | tee {outdir}/progress.txt')  # `2>&1` stderr to stdout --> tee to progress.txt
 

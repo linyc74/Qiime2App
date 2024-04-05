@@ -262,8 +262,20 @@ class FileDialogSave(FileDialog):
         d.setOptions(QFileDialog.DontUseNativeDialog)
         d.setAcceptMode(QFileDialog.AcceptSave)
         d.exec_()
-        selected = d.selectedFiles()
-        return selected[0] if len(selected) > 0 else ''
+
+        files = d.selectedFiles()
+
+        name_filter = d.selectedNameFilter()
+        ext = name_filter.split('(*')[-1].split(')')[0]  # e.g. 'CSV files (*.csv)' -> '.csv'
+
+        if len(files) == 0:
+            ret = ''
+        else:
+            ret = files[0]
+            if not ret.endswith(ext):  # add file extension if not present
+                ret += ext
+
+        return ret
 
 
 class PasswordDialog:
