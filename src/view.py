@@ -180,7 +180,7 @@ class View(QWidget):
                     if type(combo) is QComboBox:
                         combo.setCurrentText(val)
                     elif type(combo) is QCheckBox:
-                        combo.setChecked(val)
+                        combo.setChecked(True)  # when the key if present, the flag should be True
 
 
 class MessageBox:
