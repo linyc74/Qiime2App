@@ -32,6 +32,8 @@ DEFAULT_KEY_VALUES = {
     'colormap': ['Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c', 'Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2'],
     'invert-colors': False,
     'publication-figure': False,
+    'skip-differential-abundance': False,
+    'skip-picrust2': False,
     'threads': ['1', '4', '8'],
 }
 SSH_KEYS = [
@@ -61,6 +63,8 @@ QIIME2_KEYS = [
     'colormap',
     'invert-colors',
     'publication-figure',
+    'skip-differential-abundance',
+    'skip-picrust2',
     'threads',
 ]
 BUTTON_NAME_TO_LABEL = {
