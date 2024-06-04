@@ -68,6 +68,7 @@ class ActionSaveParameters(Action):
 class ActionSubmit(Action):
 
     ROOT_DIR = '~/Qiime2App'
+    BASH_PROFILE = '~/Qiime2App/.bash_profile'
 
     view: View
 
@@ -75,7 +76,6 @@ class ActionSubmit(Action):
     ssh_key_values: Dict[str, str]
     qiime2_key_values: Dict[str, str]
     con: Connection
-    env_cmd: str
     qiime2_cmd: str
     submit_cmd: str
 
@@ -90,7 +90,6 @@ class ActionSubmit(Action):
 
         try:
             self.get_key_values()
-            self.set_env_cmd()
             self.set_qiime2_cmd()
             self.set_submit_cmd()
             self.connect()
@@ -104,12 +103,8 @@ class ActionSubmit(Action):
         self.ssh_key_values = self.view.get_ssh_key_values()
         self.qiime2_key_values = self.view.get_qiime2_key_values()
 
-    def set_env_cmd(self):
-        qiime2_env = self.ssh_key_values['Qiime2 Version']
-        self.env_cmd = f'source ~/anaconda3/bin/activate {qiime2_env} && export QT_QPA_PLATFORM=offscreen'
-
     def set_qiime2_cmd(self):
-        qiime2_pipeline = self.ssh_key_values['Pipeline Version']
+        qiime2_pipeline = self.ssh_key_values['Qiime2 Pipeline']
         outdir = self.qiime2_key_values['outdir']
 
         args = [f'python {qiime2_pipeline}']
@@ -153,6 +148,6 @@ class ActionSubmit(Action):
 
     def submit_job(self):
         with self.con.cd(self.ROOT_DIR):
-            with self.con.prefix(self.env_cmd):
+            with self.con.prefix(f'source {self.BASH_PROFILE}'):
                 self.con.run(self.submit_cmd, echo=True)  # echo=True for printing out the command
         self.con.close()

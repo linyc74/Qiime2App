@@ -10,8 +10,7 @@ DEFAULT_KEY_VALUES = {
     'User': [''],
     'Host': ['255.255.255.255'],
     'Port': ['22'],
-    'Qiime2 Version': ['qiime2-2021.11'],
-    'Pipeline Version': ['qiime2_pipeline-2.3.0'],
+    'Qiime2 Pipeline': ['qiime2_pipeline-2.3.0'],
 
     'sample-sheet': ['sample-sheet.csv'],
     'fq-dir': ['data'],
@@ -40,8 +39,7 @@ SSH_KEYS = [
     'User',
     'Host',
     'Port',
-    'Qiime2 Version',
-    'Pipeline Version',
+    'Qiime2 Pipeline',
 ]
 QIIME2_KEYS = [
     'sample-sheet',
