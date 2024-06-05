@@ -1,5 +1,7 @@
 # Qiime2 App
 
+![Qiime2 App](./doc/screenshot.png)
+
 ### Server configuration
 
 Create a `~/Qiime2App` in the user's name directory, which is the root directory of the Qiime2App.
