@@ -1,4 +1,5 @@
 from typing import Dict
+from os.path import basename
 from fabric import Connection
 from .io import IO
 from .view import View
@@ -68,7 +69,7 @@ class ActionSaveParameters(Action):
 class ActionSubmit(Action):
 
     ROOT_DIR = '~/Qiime2App'
-    BASH_PROFILE = '~/Qiime2App/.bash_profile'
+    BASH_PROFILE = '.bash_profile'
 
     view: View
 
@@ -127,14 +128,19 @@ class ActionSubmit(Action):
             self.qiime2_cmd = self.qiime2_cmd.replace('"', '\'')
 
     def set_submit_cmd(self):
-        sample_sheet = self.qiime2_key_values['sample-sheet']
         outdir = self.qiime2_key_values['outdir']
+        job_name = basename(outdir).replace(' ', '_')
+        sample_sheet = self.qiime2_key_values['sample-sheet']
+
+        # the environment (.bash_profile) needs to be activated right before the qiime2_cmd
+        script = f'source {self.BASH_PROFILE} && {self.qiime2_cmd}'
+        cmd_txt = f'{outdir}/command.txt'
 
         self.submit_cmd = ' && '.join([
             f'mkdir -p "{outdir}"',
             f'cp "{sample_sheet}" "{outdir}/"',
-            f'echo "{self.qiime2_cmd}" > {outdir}/command.txt',
-            f'screen -dm bash -c "{self.qiime2_cmd}"'
+            f'echo "{script}" > "{cmd_txt}"',
+            f'screen -dm -S {job_name} bash "{cmd_txt}"'
         ])
 
     def connect(self):
@@ -142,12 +148,11 @@ class ActionSubmit(Action):
         self.con = Connection(
             host=s['Host'],
             user=s['User'],
-            port=s['Port'],
+            port=int(s['Port']),
             connect_kwargs={'password': self.ssh_password}
         )
 
     def submit_job(self):
         with self.con.cd(self.ROOT_DIR):
-            with self.con.prefix(f'source {self.BASH_PROFILE}'):
-                self.con.run(self.submit_cmd, echo=True)  # echo=True for printing out the command
+            self.con.run(self.submit_cmd, echo=True)  # echo=True for printing out the command
         self.con.close()
