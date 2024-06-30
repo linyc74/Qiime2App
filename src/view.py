@@ -1,4 +1,4 @@
-import os
+from os.path import dirname
 from typing import List, Tuple, Dict, Union
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, \
@@ -109,7 +109,7 @@ class AdvancedMode:
 class View(QWidget):
 
     TITLE = 'Qiime2 App'
-    ICON_PNG = f'{os.getcwd()}/icon/logo.ico'
+    ICON_FILE = 'icon/logo.ico'
     WIDTH, HEIGHT = 800, 1000
 
     # UI items
@@ -129,7 +129,7 @@ class View(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.TITLE)
-        self.setWindowIcon(QIcon(self.ICON_PNG))
+        self.setWindowIcon(QIcon(f'{dirname(dirname(__file__))}/{self.ICON_FILE}'))
         self.resize(self.WIDTH, self.HEIGHT)
 
         self.__init_label_combo_pairs()
