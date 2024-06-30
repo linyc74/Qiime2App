@@ -32,7 +32,7 @@ DEFAULT_KEY_VALUES = {
     'invert-colors': False,
     'publication-figure': False,
     'skip-differential-abundance': False,
-    'skip-picrust2': True,
+    'run-picrust2': True,
     'threads': ['1', '4', '8'],
 }
 BUTTON_NAME_TO_LABEL = {
@@ -95,7 +95,7 @@ class AdvancedMode:
         'invert-colors',
         'publication-figure',
         'skip-differential-abundance',
-        'skip-picrust2',
+        'run-picrust2',
         'threads',
     ]
     BUTTON_NAMES = [
