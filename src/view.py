@@ -10,7 +10,7 @@ EDIT_KEY_TO_VALUES = {
     'User': [''],
     'Host': ['255.255.255.255'],
     'Port': ['22'],
-    'Qiime2 Pipeline': ['qiime2_pipeline-2.3.0'],
+    'Qiime2 Pipeline': ['qiime2_pipeline-2.5.0'],
 
     'sample-sheet': ['sample-sheet.csv'],
     'fq-dir': ['data'],
