@@ -16,10 +16,12 @@ class Controller:
         self.view.show()
 
     def __connect_buttons_to_actions(self):
-        for name, button in self.view.buttons.items():
-            action_method = getattr(self, f'action_{name}', None)
+        for button in self.view.button_dict.values():
+            key = button.key
+            qbutton = button.qbutton
+            action_method = getattr(self, f'action_{key}', None)
             if action_method is not None:
-                button.clicked.connect(action_method)
+                qbutton.clicked.connect(action_method)
 
     def action_basic_mode(self):
         self.view.show_basic_mode()
