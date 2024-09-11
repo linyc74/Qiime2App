@@ -18,6 +18,7 @@ EDIT_KEY_TO_VALUES = {
     'fq2-suffix': ['_R2.fastq.gz'],
     'nb-classifier-qza': ['silva-138-99-nb-classifier.qza'],
     'outdir': ['output'],
+    'pacbio': False,
     'paired-end-mode': ['merge', 'pool'],
     'skip-otu': False,
     'classifier-reads-per-batch': ['1000'],
@@ -58,6 +59,7 @@ class BasicMode:
         'fq2-suffix',
         'nb-classifier-qza',
         'outdir',
+        'pacbio',
     ]
     BUTTON_NAMES = [
         'advanced_mode',
@@ -81,6 +83,7 @@ class AdvancedMode:
         'fq2-suffix',
         'nb-classifier-qza',
         'outdir',
+        'pacbio',
         'paired-end-mode',
         'skip-otu',
         'classifier-reads-per-batch',
