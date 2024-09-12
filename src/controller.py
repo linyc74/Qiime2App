@@ -130,7 +130,7 @@ class ActionSubmit(Action):
             else:  # val is string
                 args.append(f"--{key}='{val}'")
 
-        args.append(f'2>&1 | tee "{outdir}/progress.txt"')  # `2>&1` stderr to stdout --> tee to progress.txt
+        args.append(f"2>&1 | tee '{outdir}/progress.txt'")  # `2>&1` stderr to stdout --> tee to progress.txt
 
         self.qiime2_cmd = ' '.join(args)
 
