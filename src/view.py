@@ -22,6 +22,7 @@ EDIT_KEY_TO_VALUES = {
     'nb-classifier-qza': ['silva-138-99-nb-classifier.qza'],
     'reference-sequence-qza': ['silva-138-99-seqs.qza'],
     'reference-taxonomy-qza': ['silva-138-99-tax.qza'],
+    'vsearch-classifier-max-hits': ['10'],
 
     'pacbio': False,
 
@@ -98,6 +99,7 @@ class AdvancedMode:
         'nb-classifier-qza',
         'reference-sequence-qza',
         'reference-taxonomy-qza',
+        'vsearch-classifier-max-hits',
 
         'pacbio',
 
