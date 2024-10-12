@@ -42,6 +42,7 @@ EDIT_KEY_TO_VALUES = {
     'invert-colors': False,
     'publication-figure': False,
     'skip-differential-abundance': False,
+    'differential-abundance-p-value': ['0.05'],
     'run-picrust2': False,
 }
 BUTTON_KEY_TO_LABEL = {
@@ -119,6 +120,7 @@ class AdvancedMode:
         'invert-colors',
         'publication-figure',
         'skip-differential-abundance',
+        'differential-abundance-p-value',
         'run-picrust2',
     ]
     BUTTON_NAMES = [
