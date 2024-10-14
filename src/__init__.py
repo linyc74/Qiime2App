@@ -5,7 +5,7 @@ from .io import IO
 from .controller import Controller
 
 
-VERSION = 'v1.7.0'
+VERSION = 'v1.7.1-beta'
 STARTING_MESSAGE = f'''\
 Qiime2App {VERSION}
 College of Dentistry, National Yang Ming Chiao Tung University (NYCU), Taiwan

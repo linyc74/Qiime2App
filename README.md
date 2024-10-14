@@ -4,7 +4,7 @@
 
 ### Server configuration
 
-Create a `~/Qiime2App` in the user's name directory, which is the root directory of the Qiime2App.
+Create a `~/Qiime2App` in the user's home directory, which is the root directory of the Qiime2App.
 A typical directory structure is shown below:
 
 ```
@@ -28,6 +28,6 @@ export UNIFRAC_USE_GPU=N
 Other files/directories are described as follows:
 
 - `fastq/`: Directory containing all fastq files
-- `qiime2_pipeline-1.0.0/`: The `qiime2_pipeline` which can be downloaded from [here](https://github.com/linyc74/qiime2_pipeline/releases)
+- `qiime2_pipeline-1.0.0/`: The executable `qiime2_pipeline` which can be downloaded from [here](https://github.com/linyc74/qiime2_pipeline/releases)
 - `sample-sheet.csv`: The sample sheet file required by the `qiime2_pipeline`
 - `silva-138-99-nb-classifier.qza`: The classifier file required by the `qiime2_pipeline`
