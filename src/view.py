@@ -24,7 +24,7 @@ EDIT_KEY_TO_VALUES = {
     'reference-taxonomy-qza': ['silva-138-99-tax.qza'],
     'vsearch-classifier-max-hits': ['10'],
 
-    'pacbio': False,
+    'sequencing-platform': ['illumina', 'pacbio', 'nanopore'],
 
     'threads': ['1', '4', '8'],
 
@@ -71,7 +71,7 @@ class BasicMode:
         'nb-classifier-qza',
         'reference-sequence-qza',
         'reference-taxonomy-qza',
-        'pacbio',
+        'sequencing-platform',
         'threads',
     ]
     BUTTON_NAMES = [
@@ -102,7 +102,7 @@ class AdvancedMode:
         'reference-taxonomy-qza',
         'vsearch-classifier-max-hits',
 
-        'pacbio',
+        'sequencing-platform',
 
         'threads',
 
