@@ -30,6 +30,7 @@ EDIT_KEY_TO_VALUES = {
 
     'paired-end-mode': ['merge', 'pool'],
     'skip-otu': False,
+    'otu-identity': ['0.97'],
     'clip-r1-5-prime': ['17'],
     'clip-r2-5-prime': ['20'],
     'classifier-reads-per-batch': ['1000'],
@@ -108,6 +109,7 @@ class AdvancedMode:
 
         'paired-end-mode',
         'skip-otu',
+        'otu-identity',
         'clip-r1-5-prime',
         'clip-r2-5-prime',
         'classifier-reads-per-batch',
