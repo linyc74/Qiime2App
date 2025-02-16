@@ -16,7 +16,7 @@ class Controller:
         self.view.show()
 
     def __connect_buttons_to_actions(self):
-        for button in self.view.button_dict.values():
+        for button in self.view.get_buttons():
             key = button.key
             qbutton = button.qbutton
             action_method = getattr(self, f'action_{key}', None)

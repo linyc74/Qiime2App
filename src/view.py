@@ -161,8 +161,8 @@ class View(QWidget):
     ICON_FILE = 'icon/logo.ico'
     WIDTH, HEIGHT = 800, 1000
 
-    edit_dict: Dict[str, Edit]
-    button_dict: Dict[str, Button]
+    edits: List[Edit]
+    buttons: List[Button]
 
     question_layout: QVBoxLayout
     button_layout: QHBoxLayout
@@ -178,8 +178,8 @@ class View(QWidget):
         self.setWindowIcon(QIcon(f'{dirname(dirname(__file__))}/{self.ICON_FILE}'))
         self.resize(self.WIDTH, self.HEIGHT)
 
-        self.__init_edit_dict()
-        self.__init_button_dict()
+        self.__init_edits()
+        self.__init_buttons()
 
         self.__init_question_layout()
         self.__init_button_layout()
@@ -190,8 +190,8 @@ class View(QWidget):
 
         self.show_basic_mode()
 
-    def __init_edit_dict(self):
-        self.edit_dict = {}
+    def __init_edits(self):
+        self.edits = []
         for key, values in EDIT_KEY_TO_VALUES.items():
             qlabel = QLabel(f'{key}:', self)
 
@@ -206,18 +206,20 @@ class View(QWidget):
             qlabel.hide()
             qedit.hide()
 
-            self.edit_dict[key] = Edit(key=key, qlabel=qlabel, qedit=qedit)
+            edit = Edit(key=key, qlabel=qlabel, qedit=qedit)
+            self.edits.append(edit)
 
-    def __init_button_dict(self):
-        self.button_dict = {}
+    def __init_buttons(self):
+        self.buttons = []
         for key, label in BUTTON_KEY_TO_LABEL.items():
             qbutton = QPushButton(label, self)
             qbutton.hide()
-            self.button_dict[key] = Button(key=key, qbutton=qbutton)
+            button = Button(key=key, qbutton=qbutton)
+            self.buttons.append(button)
 
     def __init_question_layout(self):
         self.question_layout = QVBoxLayout()
-        for edit in self.edit_dict.values():
+        for edit in self.edits:
             self.question_layout.addWidget(edit.qlabel)
             self.question_layout.addWidget(edit.qedit)
 
@@ -225,7 +227,7 @@ class View(QWidget):
         self.button_layout = QHBoxLayout()
         self.button_layout.addStretch(1)
         self.question_layout.addLayout(self.button_layout)
-        for button in self.button_dict.values():
+        for button in self.buttons:
             self.button_layout.addWidget(button.qbutton)
 
     def __init_scroll_area_and_contents(self):
@@ -257,7 +259,7 @@ class View(QWidget):
         self.__show_mode()
 
     def __show_mode(self):
-        for edit in self.edit_dict.values():
+        for edit in self.edits:
             if edit.key in self.mode.QIIME2_KEYS + self.mode.SSH_KEYS:
                 edit.qlabel.show()
                 edit.qedit.show()
@@ -265,7 +267,7 @@ class View(QWidget):
                 edit.qlabel.hide()
                 edit.qedit.hide()
 
-        for button in self.button_dict.values():
+        for button in self.buttons:
             if button.key in self.mode.BUTTON_NAMES:
                 button.qbutton.show()
             else:
@@ -283,7 +285,7 @@ class View(QWidget):
     def __get_key_values(self, keys: List[str]) -> Dict[str, str]:
         ret = {}
 
-        for edit in self.edit_dict.values():
+        for edit in self.edits:
             if edit.key not in keys:
                 continue
 
@@ -301,14 +303,14 @@ class View(QWidget):
     def set_parameters(self, parameters: Dict[str, Union[str, bool]]):
         # Reset all visible flags to False because
         #   when a flag is not present in parameters, it should be False
-        for edit in self.edit_dict.values():
+        for edit in self.edits:
             e = edit.qedit
             if e.isHidden():
                 continue
             if type(e) is QCheckBox:
                 e.setChecked(False)
 
-        for edit in self.edit_dict.values():
+        for edit in self.edits:
             e = edit.qedit
             if e.isHidden():
                 continue
@@ -321,6 +323,9 @@ class View(QWidget):
                 e.setCurrentText(val)
             elif type(e) is QCheckBox:
                 e.setChecked(True)  # when the key if present, the flag should be True
+
+    def get_buttons(self) -> List[Button]:
+        return self.buttons
 
 
 #
