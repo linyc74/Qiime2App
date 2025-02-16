@@ -1,9 +1,10 @@
 from os.path import dirname
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Tuple
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, \
     QPushButton, QScrollArea, QCheckBox, QMessageBox, QFileDialog, QDialog, QFormLayout, \
-    QLineEdit, QDialogButtonBox
+    QLineEdit, QDialogButtonBox, QTableWidget, QTableWidgetItem
 
 
 EDIT_KEY_TO_VALUES = {
@@ -51,7 +52,11 @@ BUTTON_KEY_TO_LABEL = {
     'advanced_mode': 'Advanced Mode',
     'load_parameters': 'Load Parameters',
     'save_parameters': 'Save Parameters',
+    'dashboard': 'Dashboard',
     'submit': 'Submit',
+}
+DASHBOARD_BUTTON_KEY_TO_LABEL = {
+    'update': 'Update',
 }
 
 
@@ -129,6 +134,7 @@ class AdvancedMode:
         'basic_mode',
         'load_parameters',
         'save_parameters',
+        'dashboard',
         'submit',
     ]
 
@@ -155,6 +161,57 @@ class Button:
         self.qbutton = qbutton
 
 
+class Dashboard(QWidget):
+
+    TITLE = 'Dashboard'
+    ICON_FILE = 'icon/logo.ico'
+    WIDTH, HEIGHT = 500, 300
+
+    vertical_layout: QVBoxLayout
+    table: QTableWidget
+    button_layout: QHBoxLayout
+    buttons: List[Button]
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(self.TITLE)
+        self.setWindowIcon(QIcon(f'{dirname(dirname(__file__))}/{self.ICON_FILE}'))
+        self.resize(self.WIDTH, self.HEIGHT)
+
+        self.vertical_layout = QVBoxLayout()
+        self.setLayout(self.vertical_layout)
+
+        self.table = QTableWidget(parent=self)
+        self.vertical_layout.addWidget(self.table)
+
+        self.button_layout = QHBoxLayout()
+        self.button_layout.addStretch(1)
+        self.vertical_layout.addLayout(self.button_layout)
+
+        self.buttons = []
+        for key, label in DASHBOARD_BUTTON_KEY_TO_LABEL.items():
+            qbutton = QPushButton(label, self)
+            self.button_layout.addWidget(qbutton)
+            button = Button(key=key, qbutton=qbutton)
+            self.buttons.append(button)
+
+    def display_jobs(self, jobs: List[Tuple[str, str]]):
+        self.table.setRowCount(len(jobs))
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(['Job ID', 'Start Time'])
+        for row, (job_id, start_time) in enumerate(jobs):
+
+            item = QTableWidgetItem(job_id)
+            item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # makes the item immutable, i.e. user cannot edit it
+            self.table.setItem(row, 0, item)
+
+            item = QTableWidgetItem(start_time)
+            item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+            self.table.setItem(row, 1, item)
+
+        self.table.resizeColumnsToContents()
+
+
 class View(QWidget):
 
     TITLE = 'Qiime2 App'
@@ -163,6 +220,7 @@ class View(QWidget):
 
     edits: List[Edit]
     buttons: List[Button]
+    dashboard: Dashboard
 
     question_layout: QVBoxLayout
     button_layout: QHBoxLayout
@@ -180,6 +238,7 @@ class View(QWidget):
 
         self.__init_edits()
         self.__init_buttons()
+        self.dashboard = Dashboard()
 
         self.__init_question_layout()
         self.__init_button_layout()
@@ -326,6 +385,9 @@ class View(QWidget):
 
     def get_buttons(self) -> List[Button]:
         return self.buttons
+
+    def closeEvent(self, event):
+        self.dashboard.close()
 
 
 #
