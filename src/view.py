@@ -52,11 +52,11 @@ BUTTON_KEY_TO_LABEL = {
     'advanced_mode': 'Advanced Mode',
     'load_parameters': 'Load Parameters',
     'save_parameters': 'Save Parameters',
-    'dashboard': 'Dashboard',
+    'show_dashboard': 'Dashboard',
     'submit': 'Submit',
 }
 DASHBOARD_BUTTON_KEY_TO_LABEL = {
-    'update': 'Update',
+    'update_dashboard': 'Update',
 }
 
 
@@ -134,7 +134,7 @@ class AdvancedMode:
         'basic_mode',
         'load_parameters',
         'save_parameters',
-        'dashboard',
+        'show_dashboard',
         'submit',
     ]
 
@@ -165,7 +165,7 @@ class Dashboard(QWidget):
 
     TITLE = 'Dashboard'
     ICON_FILE = 'icon/logo.ico'
-    WIDTH, HEIGHT = 500, 300
+    WIDTH, HEIGHT = 600, 400
 
     vertical_layout: QVBoxLayout
     table: QTableWidget
@@ -195,10 +195,13 @@ class Dashboard(QWidget):
             button = Button(key=key, qbutton=qbutton)
             self.buttons.append(button)
 
+        self.display_jobs(jobs=[])
+
     def display_jobs(self, jobs: List[Tuple[str, str]]):
         self.table.setRowCount(len(jobs))
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(['Job ID', 'Start Time'])
+
         for row, (job_id, start_time) in enumerate(jobs):
 
             item = QTableWidgetItem(job_id)
@@ -227,6 +230,7 @@ class View(QWidget):
     scroll_area: QScrollArea
     scroll_contents: QWidget
     main_layout: QVBoxLayout
+    dashboard: Dashboard
 
     mode: Union[BasicMode, AdvancedMode]
 
@@ -383,8 +387,18 @@ class View(QWidget):
             elif type(e) is QCheckBox:
                 e.setChecked(True)  # when the key if present, the flag should be True
 
-    def get_buttons(self) -> List[Button]:
-        return self.buttons
+    def get_all_buttons(self) -> List[Button]:
+        return self.buttons + self.dashboard.buttons
+
+    def show_dashboard(self):
+        self.dashboard.show()
+        self.dashboard.raise_()
+        self.dashboard.activateWindow()
+
+    def display_jobs(self, jobs: List[Tuple[str, str]]):
+        self.dashboard.display_jobs(jobs)
+        self.dashboard.raise_()
+        self.dashboard.activateWindow()
 
     def closeEvent(self, event):
         self.dashboard.close()
