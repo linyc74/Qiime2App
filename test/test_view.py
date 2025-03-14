@@ -12,6 +12,7 @@ class ShowUI:
         app = QApplication(sys.argv)
         view = View()
         view.show()
+        view.show_dashboard()
         sys.exit(app.exec_())
 
     def config_taskbar_icon(self):

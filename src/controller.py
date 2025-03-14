@@ -46,6 +46,9 @@ class Controller:
     def action_update_dashboard(self):
         ActionUpdateDashboard(self).exec()
 
+    def action_kill_jobs(self):
+        ActionKillJobs(self).exec()
+
 
 class Action:
 
@@ -182,10 +185,12 @@ class ActionUpdateDashboard(Action):
 
     ssh_password: str
     ssh_key_values: Dict[str, str]
-    response: str
-    jobs: List[Tuple[str, str]]
 
     def exec(self):
+        self.workflow()
+        self.view.show_dashboard()  # bring the dashboard to the front in the end
+
+    def workflow(self):
         self.ssh_password = self.view.password_dialog()
         if self.ssh_password == '':
             return
@@ -193,13 +198,13 @@ class ActionUpdateDashboard(Action):
         self.ssh_key_values = self.view.get_ssh_key_values()
 
         try:
-            self.request()
-            self.parse_response()
-            self.view.display_jobs(jobs=self.jobs)
+            stdout = self.request()
+            jobs = parse_screen_ls(stdout=stdout)
+            self.view.display_jobs(jobs=jobs)
         except Exception as e:
             self.view.message_box_error(msg=str(e))
 
-    def request(self):
+    def request(self) -> str:
         s = self.ssh_key_values
         con = Connection(
             host=s['Host'],
@@ -212,34 +217,123 @@ class ActionUpdateDashboard(Action):
             # echo=True for printing out the command
             # warn=True for ignoring bad exit code (1) when there is no screen
             response = con.run(f'source {self.BASH_PROFILE} && screen -ls', echo=True, warn=True)
-            self.response = response.stdout
         con.close()
+        return response.stdout
 
-    def parse_response(self):
-        """
-        Three typical responses:
 
-        ---1---
-        No Sockets found in /run/screen/S-linyc74.
-        -------
+class ActionKillJobs(Action):
 
-        ---2---
-        There is a screen on:
-        	833015.outdir	(02/16/2025 03:25:51 PM)	(Detached)
-        1 Socket in /run/screen/S-linyc74.
-        -------
+    ROOT_DIR = '~/Qiime2App'
+    BASH_PROFILE = '.bash_profile'
 
-        ---3---
-        There are screens on:
-        	835269.outdir_1	(02/16/2025 09:12:36 PM)	(Detached)
-        	833015.outdir_2	(02/16/2025 03:25:51 PM)	(Detached)
-        2 Sockets in /run/screen/S-linyc74.
-        -------
-        """
-        lines = self.response.splitlines()
-        self.jobs = []
-        if lines[0].startswith('There'):
-            for line in lines[1:-1]:
-                job_id, start_time = line.split('\t')[1:3]
-                start_time = start_time[1:-1]  # remove the parentheses
-                self.jobs.append((job_id, start_time))
+    job_ids: List[str]
+    ssh_password: str
+    connection: Connection
+
+    def exec(self):
+        self.workflow()
+        self.view.show_dashboard()  # bring the dashboard to the front in the end
+
+    def workflow(self):
+        self.job_ids = self.view.dashboard.get_selected_job_ids()
+
+        if len(self.job_ids) == 0:
+            self.view.message_box_info(msg='No job selected')
+            return
+
+        yes = self.ask_message()
+        if not yes:
+            return
+
+        self.ssh_password = self.view.password_dialog()
+        if self.ssh_password == '':
+            return
+
+        try:
+            self.set_up_connection()
+            stdout = self.submit_commands()
+            jobs = parse_screen_ls(stdout=stdout)
+            self.view.display_jobs(jobs=jobs)
+            self.connection.close()
+        except Exception as e:
+            self.view.message_box_error(msg=str(e))
+
+    def ask_message(self) -> bool:
+        x = 'job' if len(self.job_ids) == 1 else 'jobs'
+        y = '\n'.join(self.job_ids)
+        msg = f'Are you sure to kill {len(self.job_ids)} {x}?\n\n{y}'
+        yes_or_no = self.view.message_box_yes_no(msg=msg)
+        return yes_or_no
+
+    def set_up_connection(self):
+        s = self.view.get_ssh_key_values()
+        self.connection = Connection(
+            host=s['Host'],
+            user=s['User'],
+            port=int(s['Port']),
+            connect_kwargs={'password': self.ssh_password}
+        )
+
+    def submit_commands(self):
+        kill_cmds = []
+        for job_id in self.job_ids:
+            kill_cmds.append(f'screen -S {job_id} -X quit')
+
+        joined = ' && '.join(kill_cmds)
+        command = f'source {self.BASH_PROFILE} && {joined}'
+        with self.connection.cd(self.ROOT_DIR):
+            self.connection.run(command=command, echo=True)
+
+        command = f'source {self.BASH_PROFILE} && screen -ls'
+        with self.connection.cd(self.ROOT_DIR):
+            # warn=True for ignoring bad exit code (1) when there is no screen
+            response = self.connection.run(command=command, echo=True, warn=True)
+
+        return response.stdout
+
+
+def parse_screen_ls(stdout: str) -> List[Tuple[str, str]]:
+    """
+    :return: list of (job_id, start_time)
+
+    Three typical responses:
+
+    ---1---
+    No Sockets found in /run/screen/S-linyc74.
+    -------
+
+    ---2---
+    There is a screen on:
+        833015.outdir	(02/16/2025 03:25:51 PM)	(Detached)
+    1 Socket in /run/screen/S-linyc74.
+    -------
+
+    ---3---
+    There are screens on:
+        835269.outdir_1	(02/16/2025 09:12:36 PM)	(Detached)
+        833015.outdir_2	(02/16/2025 03:25:51 PM)	(Detached)
+    2 Sockets in /run/screen/S-linyc74.
+    -------
+
+    Parsed examples:
+
+    ---1---
+    []
+    -------
+
+    ---2---
+    [('833015.outdir', '02/16/2025 03:25:51 PM')]
+    -------
+
+    ---3---
+    [('835269.outdir_1', '02/16/2025 09:12:36 PM'), ('833015.outdir_2', '02/16/2025 03:25:51 PM')]
+    -------
+    """
+    lines = stdout.splitlines()
+    jobs = []
+    if lines[0].startswith('There'):
+        for line in lines[1:-1]:
+            job_id, start_time = line.split('\t')[1:3]
+            start_time = start_time[1:-1]  # remove the parentheses
+            jobs.append((job_id, start_time))
+    return jobs

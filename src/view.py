@@ -57,6 +57,7 @@ BUTTON_KEY_TO_LABEL = {
 }
 DASHBOARD_BUTTON_KEY_TO_LABEL = {
     'update_dashboard': 'Update',
+    'kill_jobs': 'Kill Jobs',
 }
 
 
@@ -213,6 +214,19 @@ class Dashboard(QWidget):
             self.table.setItem(row, 1, item)
 
         self.table.resizeColumnsToContents()
+
+    def get_selected_job_ids(self) -> List[str]:
+        selected_rows = []
+        for item in self.table.selectedItems():
+            row = item.row()
+            if row not in selected_rows:
+                selected_rows.append(row)
+
+        job_ids = [
+            self.table.item(row, 0).text()  # column 0 is the job_id
+            for row in selected_rows
+        ]
+        return job_ids
 
 
 class View(QWidget):
