@@ -1,5 +1,6 @@
 from os.path import basename
 from fabric import Connection
+from datetime import datetime
 from typing import Dict, List, Tuple
 from .io import IO
 from .view import View
@@ -292,7 +293,7 @@ class ActionKillJobs(Action):
         return response.stdout
 
 
-def parse_screen_ls(stdout: str) -> List[Tuple[str, str]]:
+def parse_screen_ls(stdout: str) -> List[Tuple[str, str, str]]:
     """
     :return: list of (job_id, start_time)
 
@@ -335,5 +336,16 @@ def parse_screen_ls(stdout: str) -> List[Tuple[str, str]]:
         for line in lines[1:-1]:
             job_id, start_time = line.split('\t')[1:3]
             start_time = start_time[1:-1]  # remove the parentheses
-            jobs.append((job_id, start_time))
+            duration = duration_until_now(time_point=start_time)
+            jobs.append((job_id, start_time, duration))
     return jobs
+
+
+def duration_until_now(time_point: str):
+    time_format = '%m/%d/%Y %I:%M:%S %p'
+    time_point_dt = datetime.strptime(time_point, time_format)
+    now = datetime.now()
+    time_difference = now - time_point_dt
+    hours, remainder = divmod(time_difference.total_seconds(), 3600)
+    minutes, _ = divmod(remainder, 60)
+    return f'{int(hours)}h {int(minutes)}m'

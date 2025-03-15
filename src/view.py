@@ -166,7 +166,7 @@ class Dashboard(QWidget):
 
     TITLE = 'Dashboard'
     ICON_FILE = 'icon/logo.ico'
-    WIDTH, HEIGHT = 600, 400
+    WIDTH, HEIGHT = 800, 600
 
     vertical_layout: QVBoxLayout
     table: QTableWidget
@@ -198,20 +198,18 @@ class Dashboard(QWidget):
 
         self.display_jobs(jobs=[])
 
-    def display_jobs(self, jobs: List[Tuple[str, str]]):
+    def display_jobs(self, jobs: List[Tuple[str, str, str]]):
+        columns = ['Job ID', 'Start Time', 'Elapsed Time']
         self.table.setRowCount(len(jobs))
-        self.table.setColumnCount(2)
-        self.table.setHorizontalHeaderLabels(['Job ID', 'Start Time'])
+        self.table.setColumnCount(len(columns))
+        self.table.setHorizontalHeaderLabels(columns)
 
-        for row, (job_id, start_time) in enumerate(jobs):
-
-            item = QTableWidgetItem(job_id)
-            item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # makes the item immutable, i.e. user cannot edit it
-            self.table.setItem(row, 0, item)
-
-            item = QTableWidgetItem(start_time)
-            item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-            self.table.setItem(row, 1, item)
+        for row, job in enumerate(jobs):
+            job_id, start_time, elapsed_time = job
+            for col, text in enumerate([job_id, start_time, elapsed_time]):
+                item = QTableWidgetItem(text)
+                item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # makes the item immutable, i.e. user cannot edit it
+                self.table.setItem(row, col, item)
 
         self.table.resizeColumnsToContents()
 
@@ -409,7 +407,7 @@ class View(QWidget):
         self.dashboard.raise_()
         self.dashboard.activateWindow()
 
-    def display_jobs(self, jobs: List[Tuple[str, str]]):
+    def display_jobs(self, jobs: List[Tuple[str, str, str]]):
         self.dashboard.display_jobs(jobs)
         self.dashboard.raise_()
         self.dashboard.activateWindow()
