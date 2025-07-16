@@ -7,49 +7,49 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox
     QLineEdit, QDialogButtonBox, QTableWidget, QTableWidgetItem
 
 
-EDIT_KEY_TO_VALUES = {
-    'User': [''],
-    'Host': ['255.255.255.255'],
-    'Port': ['22'],
-    'Qiime2 Pipeline': ['qiime2_pipeline-2.7.0'],
+EDIT_KEY_TO_TYPE = {
+    'User': QComboBox,
+    'Host': QComboBox,
+    'Port': QComboBox,
+    'Qiime2 Pipeline': QComboBox,
 
-    'sample-sheet': ['sample-sheet.csv'],
-    'fq-dir': ['data'],
-    'fq1-suffix': ['_R1.fastq.gz'],
-    'fq2-suffix': ['_R2.fastq.gz'],
-    'outdir': ['output'],
+    'sample-sheet': QComboBox,
+    'fq-dir': QComboBox,
+    'fq1-suffix': QComboBox,
+    'fq2-suffix': QComboBox,
+    'outdir': QComboBox,
 
-    'feature-classifier': ['nb', 'vsearch'],
-    'nb-classifier-qza': ['silva-138-99-nb-classifier.qza'],
-    'reference-sequence-qza': ['silva-138-99-seqs.qza'],
-    'reference-taxonomy-qza': ['silva-138-99-tax.qza'],
-    'vsearch-classifier-max-hits': ['10'],
+    'feature-classifier': QComboBox,
+    'nb-classifier-qza': QComboBox,
+    'reference-sequence-qza': QComboBox,
+    'reference-taxonomy-qza': QComboBox,
+    'vsearch-classifier-max-hits': QComboBox,
 
-    'sequencing-platform': ['illumina', 'pacbio', 'nanopore'],
+    'sequencing-platform': QComboBox,
 
-    'threads': ['1', '4', '8'],
+    'threads': QComboBox,
 
-    'paired-end-mode': ['merge', 'pool'],
-    'skip-otu': False,
-    'otu-identity': ['0.97'],
-    'clip-r1-5-prime': ['17'],
-    'clip-r2-5-prime': ['20'],
-    'classifier-reads-per-batch': ['1000'],
-    'max-expected-error-bases': ['8.0'],
-    'alpha-metrics': ['all'],
-    'beta-diversity-feature-level': ['feature', 'species', 'genus', 'family', 'order', 'class', 'phylum'],
-    'heatmap-read-fraction': ['0.95'],
-    'n-taxa-barplot': ['20'],
-    'colormap': ['Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c', 'Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2'],
-    'invert-colors': False,
-    'publication-figure': False,
-    'skip-differential-abundance': False,
-    'differential-abundance-p-value': ['0.05'],
-    'run-picrust2': False,
+    'paired-end-mode': QComboBox,
+    'skip-otu': QCheckBox,
+    'otu-identity': QComboBox,
+    'clip-r1-5-prime': QComboBox,
+    'clip-r2-5-prime': QComboBox,
+    'classifier-reads-per-batch': QComboBox,
+    'max-expected-error-bases': QComboBox,
+    'alpha-metrics': QComboBox,
+    'beta-diversity-feature-level': QComboBox,
+    'heatmap-read-fraction': QComboBox,
+    'n-taxa-barplot': QComboBox,
+    'colormap': QComboBox,
+    'invert-colors': QCheckBox,
+    'publication-figure': QCheckBox,
+    'skip-differential-abundance': QCheckBox,
+    'differential-abundance-p-value': QComboBox,
+    'run-picrust2': QCheckBox,
 }
 BUTTON_KEY_TO_LABEL = {
-    'basic_mode': 'Basic Mode',
-    'advanced_mode': 'Advanced Mode',
+    'illumina_mode': 'Illumina Mode',
+    'pacbio_mode': 'PacBio Mode',
     'load_parameters': 'Load Parameters',
     'save_parameters': 'Save Parameters',
     'show_dashboard': 'Dashboard',
@@ -61,78 +61,97 @@ DASHBOARD_BUTTON_KEY_TO_LABEL = {
 }
 
 
-class BasicMode:
-    SSH_KEYS = [
-        'User',
-        'Host',
-        'Port',
-        'Qiime2 Pipeline',
-    ]
-    QIIME2_KEYS = [
-        'sample-sheet',
-        'fq-dir',
-        'fq1-suffix',
-        'fq2-suffix',
-        'outdir',
-        'feature-classifier',
-        'nb-classifier-qza',
-        'reference-sequence-qza',
-        'reference-taxonomy-qza',
-        'sequencing-platform',
-        'threads',
-    ]
-    BUTTON_NAMES = [
-        'advanced_mode',
+class IlluminaMode:
+    SSH_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
+        'User': [''],
+        'Host': ['255.255.255.255'],
+        'Port': ['22'],
+        'Qiime2 Pipeline': ['qiime2_pipeline-2.10.0'],
+    }
+    QIIME2_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
+        'sample-sheet': ['sample-sheet.csv'],
+        'fq-dir': ['data'],
+        'fq1-suffix': ['_R1.fastq.gz'],
+        'fq2-suffix': ['_R2.fastq.gz'],
+        'outdir': ['output'],
+
+        'feature-classifier': ['nb', 'vsearch'],
+        'nb-classifier-qza': ['silva-138-99-nb-classifier.qza'],
+        'reference-sequence-qza': ['silva-138-99-seqs.qza'],
+        'reference-taxonomy-qza': ['silva-138-99-tax.qza'],
+        'vsearch-classifier-max-hits': ['10'],
+
+        'sequencing-platform': ['illumina'],
+
+        'threads': ['1', '4', '8'],
+
+        'paired-end-mode': ['merge', 'pool'],
+        'skip-otu': False,
+        'otu-identity': ['0.97'],
+        'clip-r1-5-prime': ['17'],
+        'clip-r2-5-prime': ['20'],
+        'classifier-reads-per-batch': ['1000'],
+        'max-expected-error-bases': ['8.0'],
+        'alpha-metrics': ['all'],
+        'beta-diversity-feature-level': ['feature', 'species', 'genus', 'family', 'order', 'class', 'phylum'],
+        'heatmap-read-fraction': ['0.95'],
+        'n-taxa-barplot': ['20'],
+        'colormap': ['Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c', 'Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2'],
+        'invert-colors': False,
+        'publication-figure': False,
+        'skip-differential-abundance': False,
+        'differential-abundance-p-value': ['0.05'],
+        'run-picrust2': False,
+    }
+    BUTTON_KEYS = [
+        'pacbio_mode',
         'load_parameters',
         'save_parameters',
+        'show_dashboard',
         'submit',
     ]
 
 
-class AdvancedMode:
-    SSH_KEYS = [
-        'User',
-        'Host',
-        'Port',
-        'Qiime2 Pipeline',
-    ]
-    QIIME2_KEYS = [
-        'sample-sheet',
-        'fq-dir',
-        'fq1-suffix',
-        'fq2-suffix',
-        'outdir',
+class PacBioMode:
+    SSH_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
+        'User': [''],
+        'Host': ['255.255.255.255'],
+        'Port': ['22'],
+        'Qiime2 Pipeline': ['qiime2_pipeline-2.10.0'],
+    }
+    QIIME2_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
+        'sample-sheet': ['sample-sheet.csv'],
+        'fq-dir': ['data'],
+        'fq1-suffix': ['.fastq.gz'],
+        'outdir': ['output'],
 
-        'feature-classifier',
-        'nb-classifier-qza',
-        'reference-sequence-qza',
-        'reference-taxonomy-qza',
-        'vsearch-classifier-max-hits',
+        'feature-classifier': ['nb', 'vsearch'],
+        'nb-classifier-qza': ['silva-138-99-nb-classifier.qza'],
+        'reference-sequence-qza': ['silva-138-99-seqs.qza'],
+        'reference-taxonomy-qza': ['silva-138-99-tax.qza'],
+        'vsearch-classifier-max-hits': ['10'],
 
-        'sequencing-platform',
+        'sequencing-platform': ['pacbio'],
 
-        'threads',
+        'threads': ['1', '4', '8'],
 
-        'paired-end-mode',
-        'skip-otu',
-        'otu-identity',
-        'clip-r1-5-prime',
-        'clip-r2-5-prime',
-        'classifier-reads-per-batch',
-        'max-expected-error-bases',
-        'alpha-metrics',
-        'beta-diversity-feature-level',
-        'heatmap-read-fraction',
-        'n-taxa-barplot',
-        'colormap',
-        'invert-colors',
-        'publication-figure',
-        'skip-differential-abundance',
-        'differential-abundance-p-value',
-        'run-picrust2',
-    ]
-    BUTTON_NAMES = [
-        'basic_mode',
+        'skip-otu': False,
+        'otu-identity': ['0.97'],
+        'classifier-reads-per-batch': ['1000'],
+        'max-expected-error-bases': ['8.0'],
+        'alpha-metrics': ['all'],
+        'beta-diversity-feature-level': ['feature', 'species', 'genus', 'family', 'order', 'class', 'phylum'],
+        'heatmap-read-fraction': ['0.95'],
+        'n-taxa-barplot': ['20'],
+        'colormap': ['Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c', 'Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2'],
+        'invert-colors': False,
+        'publication-figure': False,
+        'skip-differential-abundance': False,
+        'differential-abundance-p-value': ['0.05'],
+        'run-picrust2': False,
+    }
+    BUTTON_KEYS = [
+        'illumina_mode',
         'load_parameters',
         'save_parameters',
         'show_dashboard',
@@ -244,7 +263,7 @@ class View(QWidget):
     main_layout: QVBoxLayout
     dashboard: Dashboard
 
-    mode: Union[BasicMode, AdvancedMode]
+    mode: Union[IlluminaMode, PacBioMode]
 
     def __init__(self):
         super().__init__()
@@ -263,22 +282,20 @@ class View(QWidget):
 
         self.__init_ui_methods()
 
-        self.show_basic_mode()
+        self.show_illumina_mode()
 
     def __init_edits(self):
         self.edits = []
-        for key, values in EDIT_KEY_TO_VALUES.items():
+        for key, type_ in EDIT_KEY_TO_TYPE.items():
             qlabel = QLabel(f'{key}:', self)
 
-            if type(values) is bool:
+            if type_ is QCheckBox:
                 qedit = QCheckBox(self)
-                qedit.setChecked(values)
             else:
                 qedit = QComboBox(self)
-                qedit.addItems(values)
                 qedit.setEditable(True)
 
-            qlabel.hide()
+            qlabel.hide()  # hide by default, show it later depending on the mode
             qedit.hide()
 
             edit = Edit(key=key, qlabel=qlabel, qedit=qedit)
@@ -325,37 +342,54 @@ class View(QWidget):
         self.file_dialog_save = FileDialogSave(self)
         self.password_dialog = PasswordDialog(self)
 
-    def show_basic_mode(self):
-        self.mode = BasicMode()
+    def show_illumina_mode(self):
+        self.mode = IlluminaMode()
         self.__show_mode()
 
-    def show_advanced_mode(self):
-        self.mode = AdvancedMode()
+    def show_pacbio_mode(self):
+        self.mode = PacBioMode()
         self.__show_mode()
 
     def __show_mode(self):
+
+        key_to_values: Dict[str, Union[List[str], bool]]
+        key_to_values = {**self.mode.SSH_KEY_TO_VALUES, **self.mode.QIIME2_KEY_TO_VALUES}  # combine the two dictionaries
+
         for edit in self.edits:
-            if edit.key in self.mode.QIIME2_KEYS + self.mode.SSH_KEYS:
-                edit.qlabel.show()
-                edit.qedit.show()
-            else:
+
+            values = key_to_values.get(edit.key, None)
+
+            if values is None:  # key not in the current mode
                 edit.qlabel.hide()
                 edit.qedit.hide()
+                continue
+
+            if type(edit.qedit) is QComboBox:
+                edit.qedit.clear()
+                edit.qedit.addItems(values)  # values is a list of strings for QComboBox
+            elif type(edit.qedit) is QCheckBox:
+                edit.qedit.setChecked(values)  # values is a boolean for QCheckBox
+
+            edit.qlabel.show()
+            edit.qedit.show()
 
         for button in self.buttons:
-            if button.key in self.mode.BUTTON_NAMES:
+            if button.key in self.mode.BUTTON_KEYS:
                 button.qbutton.show()
             else:
                 button.qbutton.hide()
 
     def get_key_values(self) -> Dict[str, Union[str, bool]]:
-        return self.__get_key_values(keys=self.mode.SSH_KEYS + self.mode.QIIME2_KEYS)
+        keys = list(self.mode.SSH_KEY_TO_VALUES.keys()) + list(self.mode.QIIME2_KEY_TO_VALUES.keys())
+        return self.__get_key_values(keys=keys)
 
     def get_ssh_key_values(self) -> Dict[str, Union[str, bool]]:
-        return self.__get_key_values(keys=self.mode.SSH_KEYS)
+        keys = list(self.mode.SSH_KEY_TO_VALUES.keys())
+        return self.__get_key_values(keys=keys)
 
     def get_qiime2_key_values(self) -> Dict[str, Union[str, bool]]:
-        return self.__get_key_values(keys=self.mode.QIIME2_KEYS)
+        keys = list(self.mode.QIIME2_KEY_TO_VALUES.keys())
+        return self.__get_key_values(keys=keys)
 
     def __get_key_values(self, keys: List[str]) -> Dict[str, str]:
         ret = {}
