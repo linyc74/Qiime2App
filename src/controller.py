@@ -6,6 +6,10 @@ from .io import IO
 from .view import View
 
 
+REMOTE_ROOT_DIR = '~/Qiime2App'
+PROFILE_FILE = '.profile'
+
+
 class Controller:
 
     view: View
@@ -91,9 +95,6 @@ class ActionSaveParameters(Action):
 
 class ActionSubmit(Action):
 
-    ROOT_DIR = '~/Qiime2App'
-    BASH_PROFILE = '.bash_profile'
-
     ssh_password: str
     ssh_key_values: Dict[str, str]
     qiime2_key_values: Dict[str, str]
@@ -153,8 +154,8 @@ class ActionSubmit(Action):
         job_name = basename(outdir).replace(' ', '_')
         sample_sheet = self.qiime2_key_values['sample-sheet']
 
-        # the environment (.bash_profile) needs to be activated right before the qiime2_cmd
-        script = f'source {self.BASH_PROFILE} && {self.qiime2_cmd}'
+        # the environment (.profile) needs to be activated right before the qiime2_cmd
+        script = f'source {PROFILE_FILE} && {self.qiime2_cmd}'
         cmd_txt = f'{outdir}/command.txt'
 
         self.submit_cmd = ' && '.join([
@@ -174,15 +175,12 @@ class ActionSubmit(Action):
         )
 
     def submit_job(self):
-        with self.con.cd(self.ROOT_DIR):
+        with self.con.cd(REMOTE_ROOT_DIR):
             self.con.run(self.submit_cmd, echo=True)  # echo=True for printing out the command
         self.con.close()
 
 
 class ActionUpdateDashboard(Action):
-
-    ROOT_DIR = '~/Qiime2App'
-    BASH_PROFILE = '.bash_profile'
 
     ssh_password: str
     ssh_key_values: Dict[str, str]
@@ -213,19 +211,16 @@ class ActionUpdateDashboard(Action):
             port=int(s['Port']),
             connect_kwargs={'password': self.ssh_password}
         )
-        with con.cd(self.ROOT_DIR):
-            # the environment (.bash_profile) needs to be activated right before sending the request
+        with con.cd(REMOTE_ROOT_DIR):
+            # the environment (.profile) needs to be activated right before sending the request
             # echo=True for printing out the command
             # warn=True for ignoring bad exit code (1) when there is no screen
-            response = con.run(f'source {self.BASH_PROFILE} && screen -ls', echo=True, warn=True)
+            response = con.run(f'source {PROFILE_FILE} && screen -ls', echo=True, warn=True)
         con.close()
         return response.stdout
 
 
 class ActionKillJobs(Action):
-
-    ROOT_DIR = '~/Qiime2App'
-    BASH_PROFILE = '.bash_profile'
 
     job_ids: List[str]
     ssh_password: str
@@ -281,12 +276,12 @@ class ActionKillJobs(Action):
             kill_cmds.append(f'screen -S {job_id} -X quit')
 
         joined = ' && '.join(kill_cmds)
-        command = f'source {self.BASH_PROFILE} && {joined}'
-        with self.connection.cd(self.ROOT_DIR):
+        command = f'source {PROFILE_FILE} && {joined}'
+        with self.connection.cd(REMOTE_ROOT_DIR):
             self.connection.run(command=command, echo=True)
 
-        command = f'source {self.BASH_PROFILE} && screen -ls'
-        with self.connection.cd(self.ROOT_DIR):
+        command = f'source {PROFILE_FILE} && screen -ls'
+        with self.connection.cd(REMOTE_ROOT_DIR):
             # warn=True for ignoring bad exit code (1) when there is no screen
             response = self.connection.run(command=command, echo=True, warn=True)
 
