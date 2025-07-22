@@ -62,11 +62,12 @@ DASHBOARD_BUTTON_KEY_TO_LABEL = {
 
 
 class IlluminaMode:
+    NAME = 'Illumina Mode'
     SSH_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
         'User': [''],
         'Host': ['255.255.255.255'],
         'Port': ['22'],
-        'Qiime2 Pipeline': ['qiime2_pipeline-2.10.1'],
+        'Qiime2 Pipeline': ['qiime2_pipeline-2.10.2'],
     }
     QIIME2_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
         'sample-sheet': ['sample-sheet.csv'],
@@ -113,11 +114,12 @@ class IlluminaMode:
 
 
 class PacBioMode:
+    NAME = 'PacBio Mode'
     SSH_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
         'User': [''],
         'Host': ['255.255.255.255'],
         'Port': ['22'],
-        'Qiime2 Pipeline': ['qiime2_pipeline-2.10.1'],
+        'Qiime2 Pipeline': ['qiime2_pipeline-2.10.2'],
     }
     QIIME2_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
         'sample-sheet': ['sample-sheet.csv'],
@@ -250,7 +252,7 @@ class View(QWidget):
 
     TITLE = 'Qiime2 App'
     ICON_FILE = 'icon/logo.ico'
-    WIDTH, HEIGHT = 800, 1000
+    WIDTH, HEIGHT = 1000, 1000
 
     edits: List[Edit]
     buttons: List[Button]
@@ -267,7 +269,6 @@ class View(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(self.TITLE)
         self.setWindowIcon(QIcon(f'{dirname(dirname(__file__))}/{self.ICON_FILE}'))
         self.resize(self.WIDTH, self.HEIGHT)
 
@@ -351,6 +352,8 @@ class View(QWidget):
         self.__show_mode()
 
     def __show_mode(self):
+
+        self.setWindowTitle(f'{self.TITLE} - {self.mode.NAME}')
 
         key_to_values: Dict[str, Union[List[str], bool]]
         key_to_values = {**self.mode.SSH_KEY_TO_VALUES, **self.mode.QIIME2_KEY_TO_VALUES}  # combine the two dictionaries
