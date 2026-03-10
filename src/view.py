@@ -45,7 +45,7 @@ EDIT_KEY_TO_TYPE = {
     'publication-figure': QCheckBox,
     'skip-differential-abundance': QCheckBox,
     'differential-abundance-p-value': QComboBox,
-    'run-picrust2': QCheckBox,
+    'min-abundance-per-group': QComboBox,
 }
 BUTTON_KEY_TO_LABEL = {
     'illumina_mode': 'Illumina Mode',
@@ -102,7 +102,7 @@ class IlluminaMode:
         'publication-figure': False,
         'skip-differential-abundance': False,
         'differential-abundance-p-value': ['0.05'],
-        'run-picrust2': False,
+        'min-abundance-per-group': ['0.0'],
     }
     BUTTON_KEYS = [
         'pacbio_mode',
@@ -150,7 +150,7 @@ class PacBioMode:
         'publication-figure': False,
         'skip-differential-abundance': False,
         'differential-abundance-p-value': ['0.05'],
-        'run-picrust2': False,
+        'min-abundance-per-group': ['0.0'],
     }
     BUTTON_KEYS = [
         'illumina_mode',
