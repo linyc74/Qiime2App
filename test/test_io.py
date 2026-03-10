@@ -14,19 +14,19 @@ class TestIO(TestCase):
         actual = IO().read(f'{self.indir}/parameters.txt')
         self.assertEqual(actual['User'], 'me')
         self.assertEqual(actual['skip-otu'], True)
-        self.assertEqual(actual['colors'], "'#59A257,#4A759D'")
+        self.assertEqual(actual['colors'], "#59A257,#4A759D")
 
     def test_read_tsv(self):
         actual = IO().read(f'{self.indir}/parameters.tsv')
         self.assertEqual(actual['User'], 'me')
         self.assertEqual(actual['skip-otu'], True)
-        self.assertEqual(actual['colors'], "'#59A257,#4A759D'")
+        self.assertEqual(actual['colors'], "#59A257,#4A759D")
 
     def test_read_csv(self):
         actual = IO().read(f'{self.indir}/parameters.csv')
         self.assertEqual(actual['User'], 'me')
         self.assertEqual(actual['skip-otu'], True)
-        self.assertEqual(actual['colors'], "'#59A257,#4A759D'")
+        self.assertEqual(actual['colors'], "#59A257,#4A759D")
 
     def test_write_txt(self):
         IO().write(
@@ -35,7 +35,7 @@ class TestIO(TestCase):
                 'Host': '255.255.255.255',
                 'skip-otu': True,
                 'flag': False,  # should not be written
-                'colors': "'#59A257,#4A759D'",
+                'colors': "#59A257,#4A759D",
             },
             file=f'{self.outdir}/written.txt'
         )
@@ -51,7 +51,7 @@ class TestIO(TestCase):
                 'Host': '255.255.255.255',
                 'skip-otu': True,
                 'flag': False,  # should not be written
-                'colors': "'#59A257,#4A759D'",
+                'colors': "#59A257,#4A759D",
             },
             file=f'{self.outdir}/written.csv'
         )

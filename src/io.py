@@ -41,6 +41,8 @@ class IO:
                     key, val = row[0], True
                 else:
                     key, val = row[0:2]
+                if val == '':  # flag without value
+                    val = True
                 ret[key] = val
         return ret
 
