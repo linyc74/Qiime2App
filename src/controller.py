@@ -103,11 +103,9 @@ class ActionSubmit(Action):
         self.sample_sheet_local_path = self.view.file_dialog_open(title='Upload Sample Sheet')
         if self.sample_sheet_local_path == '':
             return
-
         self.ssh_password = self.view.password_dialog()
         if self.ssh_password == '':
             return
-
         if not self.view.message_box_yes_no(msg='Are you sure you want to submit the job?'):
             return
 
@@ -131,7 +129,7 @@ class ActionSubmit(Action):
                 args.append(f"--{key}='{val}'")
         
         fname = basename(self.sample_sheet_local_path)
-        args.append(f"--sample-sheet='{outdir}/{fname}'")  # will be uploaded by the user
+        args.append(f"--sample-sheet='{outdir}/{fname}'")  # uploaded by the user
 
         args.append(f"2>&1 | tee '{outdir}/progress.txt'")  # `2>&1` stderr to stdout --> tee to progress.txt
 
