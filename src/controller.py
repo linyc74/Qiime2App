@@ -1,12 +1,12 @@
-from os.path import basename
 from fabric import Connection
 from datetime import datetime
 from typing import Dict, List, Tuple
+from os.path import basename, abspath
 from .io import IO
 from .view import View
 
 
-REMOTE_ROOT_DIR = '~/Qiime2App'
+REMOTE_ROOT_DIR = 'Qiime2App'  # placed in the remote user's home directory
 PROFILE_FILE = '.profile'
 
 
@@ -64,45 +64,45 @@ class Action:
         self.io = controller.io
         self.view = controller.view
 
+    def exec(self):
+        try:
+            self.workflow()
+        except Exception as e:
+            self.view.message_box_error(msg=repr(e))
+
 
 class ActionLoadParameters(Action):
 
-    def exec(self):
-        file = self.view.file_dialog_open()
+    def workflow(self):
+        file = self.view.file_dialog_open(title='Load Parameters')
         if file == '':
             return
-
-        try:
-            parameters = self.io.read(file=file)
-            self.view.set_parameters(parameters=parameters)
-        except Exception as e:
-            self.view.message_box_error(msg=str(e))
+        parameters = self.io.read(file=file)
+        self.view.set_parameters(parameters=parameters)
 
 
 class ActionSaveParameters(Action):
 
-    def exec(self):
+    def workflow(self):
         file = self.view.file_dialog_save()
         if file == '':
             return
-
-        try:
-            parameters = self.view.get_key_values()
-            self.io.write(file=file, parameters=parameters)
-        except Exception as e:
-            self.view.message_box_error(msg=str(e))
+        parameters = self.view.get_key_values()
+        self.io.write(file=file, parameters=parameters)
 
 
 class ActionSubmit(Action):
 
+    sample_sheet_local_path: str
     ssh_password: str
     ssh_key_values: Dict[str, str]
     qiime2_key_values: Dict[str, str]
-    con: Connection
     qiime2_cmd: str
-    submit_cmd: str
 
-    def exec(self):
+    def workflow(self):
+        self.sample_sheet_local_path = self.view.file_dialog_open(title='Upload Sample Sheet')
+        if self.sample_sheet_local_path == '':
+            return
 
         self.ssh_password = self.view.password_dialog()
         if self.ssh_password == '':
@@ -111,22 +111,14 @@ class ActionSubmit(Action):
         if not self.view.message_box_yes_no(msg='Are you sure you want to submit the job?'):
             return
 
-        try:
-            self.get_key_values()
-            self.set_qiime2_cmd()
-            self.set_submit_cmd()
-            self.connect()
-            self.submit_job()
-            self.view.message_box_info(msg='Job submitted!')
-
-        except Exception as e:
-            self.view.message_box_error(msg=str(e))
-
-    def get_key_values(self):
         self.ssh_key_values = self.view.get_ssh_key_values()
         self.qiime2_key_values = self.view.get_qiime2_key_values()
 
-    def set_qiime2_cmd(self):
+        self.build_qiime2_cmd()
+        self.connect_and_submit_job()
+        self.view.message_box_info(msg='Job submitted!')
+
+    def build_qiime2_cmd(self):
         qiime2_pipeline = self.ssh_key_values['Qiime2 Pipeline']
         outdir = self.qiime2_key_values['outdir']
 
@@ -135,13 +127,15 @@ class ActionSubmit(Action):
             if type(val) is bool:
                 if val is True:
                     args.append(f'--{key}')
-
             else:  # val is string
                 args.append(f"--{key}='{val}'")
+        
+        fname = basename(self.sample_sheet_local_path)
+        args.append(f"--sample-sheet='{outdir}/{fname}'")  # will be uploaded by the user
 
         args.append(f"2>&1 | tee '{outdir}/progress.txt'")  # `2>&1` stderr to stdout --> tee to progress.txt
 
-        self.qiime2_cmd = ' '.join(args)
+        self.qiime2_cmd = '     '.join(args)
 
         if '"' in self.qiime2_cmd:
             print('Warning: double quotes in the Qiime2 pipeline command will be replaced by single quotes', flush=True)
@@ -149,45 +143,59 @@ class ActionSubmit(Action):
             # so double quotes needs to be avoided
             self.qiime2_cmd = self.qiime2_cmd.replace('"', '\'')
 
-    def set_submit_cmd(self):
-        outdir = self.qiime2_key_values['outdir']
-        job_name = basename(outdir).replace(' ', '_')
-        sample_sheet = self.qiime2_key_values['sample-sheet']
-
-        # the environment (.profile) needs to be activated right before the qiime2_cmd
-        script = f'source {PROFILE_FILE} && {self.qiime2_cmd}'
-        cmd_txt = f'{outdir}/command.txt'
-
-        self.submit_cmd = ' && '.join([
-            f'mkdir -p "{outdir}"',
-            f'cp "{sample_sheet}" "{outdir}/"',
-            f'echo "{script}" > "{cmd_txt}"',
-            f'screen -dm -S {job_name} bash "{cmd_txt}"'
-        ])
-
-    def connect(self):
+    def connect_and_submit_job(self):
+        """
+        Shell characters like './' and '~/' will work in con.run(), but not in con.put()
+        
+        To be safe, use absolute path for the remote root dir
+        The outdir is defined as relative path, but check if it traverses outside the remote root dir (security issues)
+        """
         s = self.ssh_key_values
-        self.con = Connection(
+        con = Connection(
             host=s['Host'],
             user=s['User'],
             port=int(s['Port']),
             connect_kwargs={'password': self.ssh_password}
         )
 
-    def submit_job(self):
-        with self.con.cd(REMOTE_ROOT_DIR):
-            self.con.run(self.submit_cmd, echo=True)  # echo=True for printing out the command
-        self.con.close()
+        user = self.ssh_key_values['User']
+        remote_root = f'/home/{user}/{REMOTE_ROOT_DIR}'  # absolute path
+        outdir = self.qiime2_key_values['outdir']  # relative path
+
+        assert is_subdir(parent=remote_root, child=f'{remote_root}/{outdir}'), \
+            f'The outdir "{outdir}" traverses outside the remote root directory, not safe!'
+
+        with con.cd(remote_root):
+            con.run(f'mkdir -p "{outdir}"', echo=True)
+
+        print(f'Uploading "{basename(self.sample_sheet_local_path)}" to remote directory "{remote_root}/{outdir}/"', flush=True)
+        con.put(
+            local=self.sample_sheet_local_path,
+            remote=f'{remote_root}/{outdir}/'  # absolute path
+        )
+
+        # the environment (.profile) needs to be activated right before the qiime2_cmd
+        script = f'source {PROFILE_FILE} && {self.qiime2_cmd}'
+        cmd_txt = f'{outdir}/command.txt'
+        job_name = basename(outdir).replace(' ', '_')
+
+        with con.cd(remote_root):
+            con.run(f'echo "{script}" > "{cmd_txt}"', echo=True)
+            con.run(f'screen -dm -S {job_name} bash "{cmd_txt}"', echo=True)
+
+        con.close()
+
+
+def is_subdir(parent: str, child: str) -> bool:
+    p = abspath(parent)
+    c = abspath(child)
+    return c.startswith(p)
 
 
 class ActionUpdateDashboard(Action):
 
     ssh_password: str
     ssh_key_values: Dict[str, str]
-
-    def exec(self):
-        self.workflow()
-        self.view.show_dashboard()  # bring the dashboard to the front in the end
 
     def workflow(self):
         self.ssh_password = self.view.password_dialog()
@@ -196,12 +204,11 @@ class ActionUpdateDashboard(Action):
 
         self.ssh_key_values = self.view.get_ssh_key_values()
 
-        try:
-            stdout = self.request()
-            jobs = parse_screen_ls(stdout=stdout)
-            self.view.display_jobs(jobs=jobs)
-        except Exception as e:
-            self.view.message_box_error(msg=str(e))
+        stdout = self.request()
+        jobs = parse_screen_ls(stdout=stdout)
+        self.view.display_jobs(jobs=jobs)
+        
+        self.view.show_dashboard()  # bring the dashboard to the front in the end
 
     def request(self) -> str:
         s = self.ssh_key_values
@@ -226,10 +233,6 @@ class ActionKillJobs(Action):
     ssh_password: str
     connection: Connection
 
-    def exec(self):
-        self.workflow()
-        self.view.show_dashboard()  # bring the dashboard to the front in the end
-
     def workflow(self):
         self.job_ids = self.view.dashboard.get_selected_job_ids()
 
@@ -245,14 +248,13 @@ class ActionKillJobs(Action):
         if self.ssh_password == '':
             return
 
-        try:
-            self.set_up_connection()
-            stdout = self.submit_commands()
-            jobs = parse_screen_ls(stdout=stdout)
-            self.view.display_jobs(jobs=jobs)
-            self.connection.close()
-        except Exception as e:
-            self.view.message_box_error(msg=str(e))
+        self.set_up_connection()
+        stdout = self.submit_commands()
+        jobs = parse_screen_ls(stdout=stdout)
+        self.view.display_jobs(jobs=jobs)
+        self.connection.close()
+        
+        self.view.show_dashboard()  # bring the dashboard to the front in the end
 
     def ask_message(self) -> bool:
         x = 'job' if len(self.job_ids) == 1 else 'jobs'

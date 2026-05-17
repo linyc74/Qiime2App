@@ -13,7 +13,6 @@ EDIT_KEY_TO_TYPE = {
     'Port': QComboBox,
     'Qiime2 Pipeline': QComboBox,
 
-    'sample-sheet': QComboBox,
     'fq-dir': QComboBox,
     'fq1-suffix': QComboBox,
     'fq2-suffix': QComboBox,
@@ -70,7 +69,6 @@ class IlluminaMode:
         'Qiime2 Pipeline': ['qiime2_pipeline-2.10.2'],
     }
     QIIME2_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
-        'sample-sheet': ['sample-sheet.csv'],
         'fq-dir': ['data'],
         'fq1-suffix': ['_R1.fastq.gz'],
         'fq2-suffix': ['_R2.fastq.gz'],
@@ -122,7 +120,6 @@ class PacBioMode:
         'Qiime2 Pipeline': ['qiime2_pipeline-2.10.2'],
     }
     QIIME2_KEY_TO_VALUES: Dict[str, Union[List[str], bool]] = {
-        'sample-sheet': ['sample-sheet.csv'],
         'fq-dir': ['data'],
         'fq1-suffix': ['.fastq.gz'],
         'outdir': ['output'],
@@ -513,10 +510,10 @@ class FileDialog:
 
 class FileDialogOpen(FileDialog):
 
-    def __call__(self) -> str:
+    def __call__(self, title: str) -> str:
         d = QFileDialog(self.parent)
         d.resize(1200, 800)
-        d.setWindowTitle('Open')
+        d.setWindowTitle(title)
         d.setNameFilter('All Files (*.*);;CSV files (*.csv);;TSV files (*.tsv);;tab files (*.tab);;TXT files (*.txt)')
         d.selectNameFilter('CSV files (*.csv)')
         d.setOptions(QFileDialog.DontUseNativeDialog)
